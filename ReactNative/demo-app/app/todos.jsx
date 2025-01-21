@@ -9,11 +9,14 @@ import Octicons from '@expo/vector-icons/Octicons'
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useRouter } from 'expo-router';
+
 const todoPage = () => {
     const [todo,setTodo] = useState([]);
     const [text, setText] = useState('');
 
     const  {colorScheme, setColorScheme, theme} = useContext(ThemeContext);
+    const router = useRouter();
 
     const [loaded,error] = useFonts({
       Inter_500Medium
@@ -86,12 +89,19 @@ const todoPage = () => {
         setTodo(newTodos)
     }
 
+    const handlePress = (id) => {
+router.push(`/todo/${id}`)
+    }
+
     const renderItem = ({item}) => (
         <View style={styles.todoItem}>
-
+<Pressable
+onPress={()=>handlePress(item.id)}
+onLongPress={()=> toggleTodo(item.id)}
+>
             <Text  style={[styles.todoText, item.completed && styles.completedText]}
-            onPress={()=> toggleTodo(item.id)}
-            >{item.title}</Text>
+            
+            >{item.title}</Text></Pressable>
             <Pressable onPress={() => removeTodo(item.id)}>
         <MaterialCommunityIcons name="delete-circle" size={36} color="red" selectable={undefined} />
       </Pressable>
