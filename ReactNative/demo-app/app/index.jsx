@@ -14,6 +14,11 @@ const app = () => {
                     <Text style={styles.buttonText}>Contact Us</Text>
                 </Pressable>
             </Link>
+            <Link href="/menu">
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Coffee Menu</Text>
+                </Pressable>
+            </Link>
         </ImageBackground>
 
     </View>)
