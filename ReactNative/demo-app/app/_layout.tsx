@@ -33,7 +33,7 @@ export default function RootLayout() {
 
   return (
    
-      <Stack screenOptions={{headerStyle:{backgroundColor:theme.headerBackground}, headerTintColor:theme.text, headerShadowVisible:false}}>
+      <Stack screenOptions={{headerStyle:{backgroundColor:theme.background}, headerTintColor:theme.text, headerShadowVisible:false}}>
         <Stack.Screen name="index" options={{ headerShown: false , title:'Home'}} />
         <Stack.Screen name="contact" options={{ headerShown: true , title:'Contact', headerTitle:'Contact Us'}} />
         <Stack.Screen name="menu" options={{ headerShown: true , title:'Menu', headerTitle:'Coffee Shop Menu'}} />
