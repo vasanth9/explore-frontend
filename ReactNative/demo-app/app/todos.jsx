@@ -1,22 +1,64 @@
 import { View, Text,TextInput , Pressable, StyleSheet, FlatList, } from 'react-native'
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, {useState} from 'react';
+import React, {useContext,useEffect,useState} from 'react';
+import { ThemeContext } from '@/context/ThemeContext';
 import {data} from '@/data/todos';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {Inter_500Medium, useFonts} from '@expo-google-fonts/inter'
+import Octicons from '@expo/vector-icons/Octicons'
+import Animated, { LinearTransition } from 'react-native-reanimated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const todoPage = () => {
-    const [todo,setTodo] = useState(data.sort((a,b)=>b.id-a.id));
-    const [text, setText] = useState('')
+    const [todo,setTodo] = useState([]);
+    const [text, setText] = useState('');
+
+    const  {colorScheme, setColorScheme, theme} = useContext(ThemeContext);
 
     const [loaded,error] = useFonts({
       Inter_500Medium
     });
 
+    useEffect(()=>{
+      const fetchData = async () => {
+        try{
+          const jsonValue = await AsyncStorage.getItem('TodoApp');
+          const storageTodos = jsonValue != null ? JSON.parse(jsonValue) : null
+          if(storageTodos && storageTodos.length){
+            setTodo(storageTodos.sort((a,b)=>b.id-a.id));
+          } else {
+            setTodo(data.sort((a,b)=>b.id-a.id))
+          }
+    
+        } catch(e){
+          console.error(e)
+        }
+
+      }
+      fetchData();
+    },[data]);
+
+    useEffect(()=>{
+     
+      const storeData = async () =>{
+        try{
+      const jsonValue = JSON.stringify(todo);
+      await AsyncStorage.setItem('TodoApp',jsonValue);
+      } 
+      catch(e){
+        console.error(e);
+      }
+    }
+      storeData();
+    },[todo])
+
     if (!loaded && !error) {
       return null
     }
   
-    // const styles = createStyles(theme, colorScheme)
+    const styles = createStyles(theme, colorScheme);
+
+    
 
     const addTodo = () => {
         if(text.trim()){
@@ -70,12 +112,18 @@ const todoPage = () => {
     <Pressable onPress={addTodo} style={styles.addButton}>
       <Text style={styles.addButtonText}>Add</Text>
     </Pressable>
+    <Pressable onPress={()=>setColorScheme(colorScheme === 'dark'?'light':'dark')}>
+    <Octicons name={colorScheme === 'dark' ? "moon" : "sun"} size={36} color={theme.text} selectable={undefined} style={{ width: 36 }} />
+    </Pressable>
+     
   </View>
-  <FlatList
+  <Animated.FlatList
     data={todo}
     renderItem={renderItem}
     keyExtractor={todo => todo.id}
     contentContainerStyle={{ flexGrow: 1 }}
+    itemLayoutAnimation={LinearTransition}
+    keyboardDismissMode="on-drag"
   />
 
 </SafeAreaView>
@@ -84,10 +132,11 @@ const todoPage = () => {
 
 export default todoPage;
 
-const styles = StyleSheet.create({
+const createStyles = (theme,colorScheme) => {
+  return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'black',
+      backgroundColor: theme.background,
     },
     inputContainer: {
       flexDirection: 'row',
@@ -109,17 +158,17 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontFamily: 'Inter_500Medium',
       minWidth: 0,
-      color: 'white',
+      color: theme.text,
     },
     addButton: {
-      backgroundColor: 'white',
+      backgroundColor: theme.button,
       borderRadius: 5,
       padding: 10,
     },
     addButtonText: {
       fontSize: 18,
       fontFamily: 'Inter_500Medium',
-      color: 'black',
+      color: colorScheme === 'dark' ? 'black' : 'white',
     },
     todoItem: {
       flexDirection: 'row',
@@ -138,10 +187,11 @@ const styles = StyleSheet.create({
       flex: 1,
       fontSize: 18,
       fontFamily: 'Inter_500Medium',
-      color: 'white',
+      color: theme.text,
     },
     completedText: {
       textDecorationLine: 'line-through',
       color: 'gray',
     }
   })
+}
