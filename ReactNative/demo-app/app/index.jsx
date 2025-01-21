@@ -19,6 +19,11 @@ const app = () => {
                     <Text style={styles.buttonText}>Coffee Menu</Text>
                 </Pressable>
             </Link>
+            <Link href="/todos">
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Todo List</Text>
+                </Pressable>
+            </Link>
         </ImageBackground>
 
     </View>)
